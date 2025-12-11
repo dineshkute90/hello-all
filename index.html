@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Table Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            padding: 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 30px;
+        }
+        
+        .input-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+            border-right: 1px solid #eee;
+        }
+        
+        .table-section {
+            flex: 2;
+            min-width: 300px;
+            padding: 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+            font-size: 1.1rem;
+        }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e1e5eb;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="number"]:focus {
+            border-color: #6a11cb;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #generateBtn {
+            background-color: #6a11cb;
+            color: white;
+        }
+        
+        #generateBtn:hover {
+            background-color: #5a0db0;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(106, 17, 203, 0.2);
+        }
+        
+        #resetBtn {
+            background-color: #f1f3f9;
+            color: #444;
+        }
+        
+        #resetBtn:hover {
+            background-color: #e1e5eb;
+        }
+        
+        .table-container {
+            margin-top: 10px;
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #e1e5eb;
+            min-height: 300px;
+            background-color: #f9fafc;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background-color: #6a11cb;
+            color: white;
+            padding: 16px 12px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 14px 12px;
+            text-align: center;
+            border: 1px solid #e1e5eb;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        tr:hover {
+            background-color: #f0f2ff;
+        }
+        
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+            color: #888;
+            text-align: center;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .instructions {
+            background-color: #f0f7ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 25px;
+            border-left: 4px solid #2575fc;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 10px;
+            color: #2575fc;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            color: #666;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .input-section {
+                border-right: none;
+                border-bottom: 1px solid #eee;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+        
+        .table-info {
+            margin-top: 15px;
+            padding: 12px 16px;
+            background-color: #f0f7ff;
+            border-radius: 6px;
+            font-weight: 500;
+            color: #2575fc;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dynamic Table Generator</h1>
+            <p class="subtitle">Create custom tables by specifying the number of rows and columns</p>
+        </header>
+        
+        <div class="content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="rows">Number of Rows:</label>
+                    <input type="number" id="rows" min="1" max="50" value="5" placeholder="Enter number of rows (1-50)">
+                </div>
+                
+                <div class="input-group">
+                    <label for="columns">Number of Columns:</label>
+                    <input type="number" id="columns" min="1" max="20" value="4" placeholder="Enter number of columns (1-20)">
+                </div>
+                
+                <div class="button-group">
+                    <button id="generateBtn">Generate Table</button>
+                    <button id="resetBtn">Reset</button>
+                </div>
+                
+                <div class="instructions">
+                    <h3>How to use:</h3>
+                    <ul>
+                        <li>Enter the number of rows and columns you want in your table</li>
+                        <li>Click "Generate Table" to create the table</li>
+                        <li>Use "Reset" to clear the table and inputs</li>
+                        <li>Maximum 50 rows and 20 columns allowed for performance</li>
+                        <li>Click on table cells to edit the content</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="table-section">
+                <h2>Generated Table</h2>
+                <div class="table-info" id="tableInfo">
+                    Table with 5 rows and 4 columns generated
+                </div>
+                <div class="table-container">
+                    <div class="empty-state" id="emptyState">
+                        <i>📊</i>
+                        <p>Your table will appear here</p>
+                        <p>Enter rows and columns above and click "Generate Table"</p>
+                    </div>
+                    <table id="dynamicTable"></table>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Dynamic Table Generator &copy; 2023 | Edit table cells by clicking on them</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const rowsInput = document.getElementById('rows');
+            const columnsInput = document.getElementById('columns');
+            const generateBtn = document.getElementById('generateBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const dynamicTable = document.getElementById('dynamicTable');
+            const emptyState = document.getElementById('emptyState');
+            const tableInfo = document.getElementById('tableInfo');
+            
+            // Generate table on page load
+            generateTable();
+            
+            // Generate table when button is clicked
+            generateBtn.addEventListener('click', generateTable);
+            
+            // Reset table when reset button is clicked
+            resetBtn.addEventListener('click', function() {
+                rowsInput.value = 5;
+                columnsInput.value = 4;
+                dynamicTable.innerHTML = '';
+                emptyState.style.display = 'flex';
+                tableInfo.style.display = 'none';
+            });
+            
+            // Generate table when Enter key is pressed in input fields
+            rowsInput.addEventListener('keyup', function(event) {
+                if (event.key === 'Enter') generateTable();
+            });
+            
+            columnsInput.addEventListener('keyup', function(event) {
+                if (event.key === 'Enter') generateTable();
+            });
+            
+            // Function to generate the table
+            function generateTable() {
+                const rows = parseInt(rowsInput.value);
+                const columns = parseInt(columnsInput.value);
+                
+                // Validate inputs
+                if (isNaN(rows) || rows < 1 || rows > 50) {
+                    alert('Please enter a valid number of rows between 1 and 50');
+                    rowsInput.focus();
+                    return;
+                }
+                
+                if (isNaN(columns) || columns < 1 || columns > 20) {
+                    alert('Please enter a valid number of columns between 1 and 20');
+                    columnsInput.focus();
+                    return;
+                }
+                
+                // Clear previous table
+                dynamicTable.innerHTML = '';
+                
+                // Create table header
+                let tableHTML = '<thead><tr>';
+                for (let i = 1; i <= columns; i++) {
+                    tableHTML += `<th>Column ${i}</th>`;
+                }
+                tableHTML += '</tr></thead>';
+                
+                // Create table body
+                tableHTML += '<tbody>';
+                for (let i = 1; i <= rows; i++) {
+                    tableHTML += '<tr>';
+                    for (let j = 1; j <= columns; j++) {
+                        tableHTML += `<td contenteditable="true">Row ${i}, Col ${j}</td>`;
+                    }
+                    tableHTML += '</tr>';
+                }
+                tableHTML += '</tbody>';
+                
+                // Insert table HTML
+                dynamicTable.innerHTML = tableHTML;
+                
+                // Hide empty state and show table
+                emptyState.style.display = 'none';
+                tableInfo.textContent = `Table with ${rows} rows and ${columns} columns generated`;
+                tableInfo.style.display = 'block';
+                
+                // Add event listeners to table cells for editing
+                const cells = dynamicTable.querySelectorAll('td');
+                cells.forEach(cell => {
+                    cell.addEventListener('click', function() {
+                        this.focus();
+                    });
+                    
+                    // Save content on blur
+                    cell.addEventListener('blur', function() {
+                        if (this.textContent.trim() === '') {
+                            const rowIndex = this.parentElement.rowIndex;
+                            const cellIndex = this.cellIndex + 1;
+                            this.textContent = `Row ${rowIndex}, Col ${cellIndex}`;
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
