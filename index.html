@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Table Generator</title>
+    <title>Advanced Editable Table Generator</title>
     <style>
         * {
             margin: 0;
@@ -13,56 +13,87 @@
         }
         
         body {
-            background-color: #f5f7fa;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
             padding: 20px;
             color: #333;
-            line-height: 1.6;
         }
         
         .container {
-            max-width: 1000px;
+            max-width: 1400px;
             margin: 0 auto;
             background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
         
         header {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 25px 30px;
+            padding: 30px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: cover;
         }
         
         h1 {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             margin-bottom: 10px;
-            letter-spacing: 0.5px;
+            position: relative;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         
         .subtitle {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             opacity: 0.9;
+            position: relative;
         }
         
-        .content {
+        .main-content {
             display: flex;
             flex-wrap: wrap;
             padding: 30px;
+            gap: 30px;
         }
         
-        .input-section {
+        .controls-panel {
             flex: 1;
-            min-width: 300px;
-            padding: 20px;
-            border-right: 1px solid #eee;
+            min-width: 320px;
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #eaeaea;
         }
         
         .table-section {
             flex: 2;
-            min-width: 300px;
-            padding: 20px;
+            min-width: 320px;
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #eaeaea;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eaeaea;
         }
         
         .input-group {
@@ -73,95 +104,131 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: #444;
-            font-size: 1.1rem;
+            color: #555;
+            font-size: 1.05rem;
         }
         
-        input[type="number"] {
+        input[type="number"], input[type="text"], select {
             width: 100%;
             padding: 14px 16px;
-            border: 2px solid #e1e5eb;
+            border: 2px solid #ddd;
             border-radius: 8px;
-            font-size: 1.1rem;
-            transition: border-color 0.3s;
+            font-size: 1.05rem;
+            transition: all 0.3s;
+            background-color: white;
         }
         
-        input[type="number"]:focus {
-            border-color: #6a11cb;
+        input[type="number"]:focus, input[type="text"]:focus, select:focus {
+            border-color: #667eea;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
         }
         
         .button-group {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 15px;
             margin-top: 30px;
         }
         
-        button {
-            flex: 1;
-            padding: 15px;
+        .btn {
+            padding: 16px 20px;
             border: none;
             border-radius: 8px;
             font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
         
-        #generateBtn {
-            background-color: #6a11cb;
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
         
-        #generateBtn:hover {
-            background-color: #5a0db0;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(106, 17, 203, 0.2);
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(102, 126, 234, 0.3);
         }
         
-        #resetBtn {
+        .btn-secondary {
             background-color: #f1f3f9;
-            color: #444;
+            color: #555;
+            border: 1px solid #ddd;
         }
         
-        #resetBtn:hover {
+        .btn-secondary:hover {
             background-color: #e1e5eb;
         }
         
+        .btn-danger {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(245, 87, 108, 0.3);
+        }
+        
         .table-container {
-            margin-top: 10px;
             overflow-x: auto;
             border-radius: 8px;
             border: 1px solid #e1e5eb;
-            min-height: 300px;
-            background-color: #f9fafc;
+            background-color: white;
+            min-height: 400px;
+            max-height: 600px;
+            overflow-y: auto;
+            position: relative;
         }
         
-        table {
+        #dynamicTable {
             width: 100%;
             border-collapse: collapse;
+            min-width: 600px;
         }
         
-        th {
-            background-color: #6a11cb;
+        #dynamicTable th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 16px 12px;
+            padding: 18px 15px;
             text-align: center;
             font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-right: 1px solid rgba(255,255,255,0.2);
+            min-width: 120px;
         }
         
-        td {
-            padding: 14px 12px;
-            text-align: center;
+        #dynamicTable th:last-child {
+            border-right: none;
+        }
+        
+        #dynamicTable td {
+            padding: 15px;
             border: 1px solid #e1e5eb;
+            text-align: center;
+            min-height: 60px;
+            vertical-align: middle;
+            transition: background-color 0.2s;
+            min-width: 120px;
         }
         
-        tr:nth-child(even) {
-            background-color: #f8f9fa;
+        #dynamicTable td:focus {
+            outline: 2px solid #667eea;
+            background-color: #f8f9ff;
         }
         
-        tr:hover {
+        #dynamicTable tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        #dynamicTable tr:hover {
             background-color: #f0f2ff;
         }
         
@@ -170,177 +237,399 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 300px;
+            height: 400px;
             color: #888;
             text-align: center;
+            padding: 30px;
         }
         
-        .empty-state i {
-            font-size: 4rem;
+        .empty-icon {
+            font-size: 5rem;
             margin-bottom: 20px;
-            opacity: 0.5;
+            opacity: 0.4;
         }
         
-        .instructions {
-            background-color: #f0f7ff;
-            border-radius: 8px;
+        .table-tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .tool-btn {
+            padding: 12px 18px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .tool-btn:hover {
+            background-color: #f5f5f5;
+            transform: translateY(-2px);
+        }
+        
+        .tool-btn.active {
+            background-color: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
             padding: 20px;
-            margin-top: 25px;
-            border-left: 4px solid #2575fc;
+            background-color: #f8f9ff;
+            border-radius: 10px;
         }
         
-        .instructions h3 {
-            margin-bottom: 10px;
-            color: #2575fc;
+        .feature {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
         }
         
-        .instructions ul {
-            padding-left: 20px;
+        .feature-icon {
+            font-size: 2rem;
+            color: #667eea;
+            background-color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         
-        .instructions li {
-            margin-bottom: 8px;
+        .feature-text h4 {
+            margin-bottom: 5px;
+            color: #444;
+        }
+        
+        .feature-text p {
+            color: #666;
+            font-size: 0.95rem;
         }
         
         footer {
             text-align: center;
-            padding: 20px;
-            margin-top: 30px;
+            padding: 25px;
+            margin-top: 20px;
             color: #666;
             border-top: 1px solid #eee;
+            background-color: #f8f9fa;
         }
         
-        @media (max-width: 768px) {
-            .content {
+        .editing-cell {
+            background-color: #fff8e1 !important;
+            box-shadow: inset 0 0 0 2px #ffc107;
+        }
+        
+        @media (max-width: 1100px) {
+            .main-content {
                 flex-direction: column;
             }
             
-            .input-section {
-                border-right: none;
-                border-bottom: 1px solid #eee;
+            .controls-panel, .table-section {
+                width: 100%;
             }
             
             h1 {
-                font-size: 2rem;
+                font-size: 2.2rem;
             }
         }
         
-        .table-info {
-            margin-top: 15px;
-            padding: 12px 16px;
-            background-color: #f0f7ff;
+        .cell-actions {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ddd;
             border-radius: 6px;
-            font-weight: 500;
-            color: #2575fc;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 100;
             display: none;
+            flex-direction: column;
+            min-width: 150px;
+        }
+        
+        .cell-action-btn {
+            padding: 10px 15px;
+            border: none;
+            background: none;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .cell-action-btn:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .color-picker {
+            display: none;
+            position: absolute;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin: 5px;
+            cursor: pointer;
+            display: inline-block;
+            border: 2px solid transparent;
+        }
+        
+        .color-option:hover {
+            border-color: #333;
+        }
+        
+        .table-stats {
+            margin-top: 15px;
+            padding: 12px 15px;
+            background-color: #e8f4ff;
+            border-radius: 8px;
+            font-weight: 500;
+            color: #0066cc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Dynamic Table Generator</h1>
-            <p class="subtitle">Create custom tables by specifying the number of rows and columns</p>
+            <h1>Advanced Editable Table Generator</h1>
+            <p class="subtitle">Create, edit, customize, and export dynamic tables with ease</p>
         </header>
         
-        <div class="content">
-            <div class="input-section">
+        <div class="main-content">
+            <div class="controls-panel">
+                <h2 class="section-title">Table Configuration</h2>
+                
                 <div class="input-group">
                     <label for="rows">Number of Rows:</label>
-                    <input type="number" id="rows" min="1" max="50" value="5" placeholder="Enter number of rows (1-50)">
+                    <input type="number" id="rows" min="1" max="100" value="6" placeholder="Enter rows (1-100)">
                 </div>
                 
                 <div class="input-group">
                     <label for="columns">Number of Columns:</label>
-                    <input type="number" id="columns" min="1" max="20" value="4" placeholder="Enter number of columns (1-20)">
+                    <input type="number" id="columns" min="1" max="26" value="5" placeholder="Enter columns (1-26)">
+                </div>
+                
+                <div class="input-group">
+                    <label for="tableTitle">Table Title:</label>
+                    <input type="text" id="tableTitle" value="Sample Data Table" placeholder="Enter table title">
+                </div>
+                
+                <div class="input-group">
+                    <label for="cellPadding">Cell Padding (px):</label>
+                    <input type="number" id="cellPadding" min="5" max="30" value="15" placeholder="Cell padding">
                 </div>
                 
                 <div class="button-group">
-                    <button id="generateBtn">Generate Table</button>
-                    <button id="resetBtn">Reset</button>
+                    <button class="btn btn-primary" id="generateBtn">
+                        <span>📊</span> Generate Table
+                    </button>
+                    <button class="btn btn-secondary" id="clearBtn">
+                        <span>🗑️</span> Clear Table
+                    </button>
                 </div>
                 
-                <div class="instructions">
-                    <h3>How to use:</h3>
-                    <ul>
-                        <li>Enter the number of rows and columns you want in your table</li>
-                        <li>Click "Generate Table" to create the table</li>
-                        <li>Use "Reset" to clear the table and inputs</li>
-                        <li>Maximum 50 rows and 20 columns allowed for performance</li>
-                        <li>Click on table cells to edit the content</li>
-                    </ul>
+                <div class="table-tools">
+                    <div class="tool-btn" id="addRowBtn" title="Add Row">
+                        <span>➕</span> Add Row
+                    </div>
+                    <div class="tool-btn" id="addColumnBtn" title="Add Column">
+                        <span>➕</span> Add Column
+                    </div>
+                    <div class="tool-btn" id="removeRowBtn" title="Remove Last Row">
+                        <span>➖</span> Remove Row
+                    </div>
+                    <div class="tool-btn" id="removeColumnBtn" title="Remove Last Column">
+                        <span>➖</span> Remove Column
+                    </div>
                 </div>
             </div>
             
             <div class="table-section">
-                <h2>Generated Table</h2>
-                <div class="table-info" id="tableInfo">
-                    Table with 5 rows and 4 columns generated
+                <h2 class="section-title">Editable Table</h2>
+                
+                <div class="table-stats" id="tableStats">
+                    <span>Table: 6 rows × 5 columns</span>
+                    <span>Double-click to edit cells</span>
                 </div>
+                
                 <div class="table-container">
                     <div class="empty-state" id="emptyState">
-                        <i>📊</i>
-                        <p>Your table will appear here</p>
-                        <p>Enter rows and columns above and click "Generate Table"</p>
+                        <div class="empty-icon">📋</div>
+                        <h3>No Table Generated Yet</h3>
+                        <p>Configure your table settings and click "Generate Table" to create an editable table.</p>
+                        <p>You can then edit any cell by double-clicking it.</p>
                     </div>
                     <table id="dynamicTable"></table>
+                </div>
+                
+                <div class="table-tools" style="margin-top: 20px;">
+                    <div class="tool-btn" id="exportBtn" title="Export as HTML">
+                        <span>📥</span> Export HTML
+                    </div>
+                    <div class="tool-btn" id="boldBtn" title="Bold Selected Text">
+                        <span>𝐁</span> Bold
+                    </div>
+                    <div class="tool-btn" id="italicBtn" title="Italic Selected Text">
+                        <span>𝐼</span> Italic
+                    </div>
+                    <div class="tool-btn" id="colorBtn" title="Change Cell Color">
+                        <span>🎨</span> Color
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">✏️</div>
+                <div class="feature-text">
+                    <h4>Fully Editable</h4>
+                    <p>Double-click any cell to edit its content. Changes are saved automatically.</p>
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📐</div>
+                <div class="feature-text">
+                    <h4>Dynamic Resizing</h4>
+                    <p>Add or remove rows and columns on the fly. Customize your table structure.</p>
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎨</div>
+                <div class="feature-text">
+                    <h4>Styling Options</h4>
+                    <p>Format text, change cell colors, and customize padding for better presentation.</p>
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📥</div>
+                <div class="feature-text">
+                    <h4>Export Functionality</h4>
+                    <p>Export your table as HTML code to use in your projects or documents.</p>
                 </div>
             </div>
         </div>
         
         <footer>
-            <p>Dynamic Table Generator &copy; 2023 | Edit table cells by clicking on them</p>
+            <p>Advanced Editable Table Generator &copy; 2023 | All cells are fully editable</p>
         </footer>
+    </div>
+    
+    <!-- Color picker -->
+    <div class="color-picker" id="colorPicker">
+        <div class="color-option" style="background-color: #ffffff;" data-color="#ffffff"></div>
+        <div class="color-option" style="background-color: #fff8e1;" data-color="#fff8e1"></div>
+        <div class="color-option" style="background-color: #e8f5e9;" data-color="#e8f5e9"></div>
+        <div class="color-option" style="background-color: #e3f2fd;" data-color="#e3f2fd"></div>
+        <div class="color-option" style="background-color: #f3e5f5;" data-color="#f3e5f5"></div>
+        <br>
+        <div class="color-option" style="background-color: #ffebee;" data-color="#ffebee"></div>
+        <div class="color-option" style="background-color: #e8eaf6;" data-color="#e8eaf6"></div>
+        <div class="color-option" style="background-color: #e0f7fa;" data-color="#e0f7fa"></div>
+        <div class="color-option" style="background-color: #f1f8e9;" data-color="#f1f8e9"></div>
+        <div class="color-option" style="background-color: #fff3e0;" data-color="#fff3e0"></div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
             const rowsInput = document.getElementById('rows');
             const columnsInput = document.getElementById('columns');
+            const tableTitleInput = document.getElementById('tableTitle');
+            const cellPaddingInput = document.getElementById('cellPadding');
             const generateBtn = document.getElementById('generateBtn');
-            const resetBtn = document.getElementById('resetBtn');
+            const clearBtn = document.getElementById('clearBtn');
             const dynamicTable = document.getElementById('dynamicTable');
             const emptyState = document.getElementById('emptyState');
-            const tableInfo = document.getElementById('tableInfo');
+            const tableStats = document.getElementById('tableStats');
+            const colorPicker = document.getElementById('colorPicker');
+            
+            // Tool buttons
+            const addRowBtn = document.getElementById('addRowBtn');
+            const addColumnBtn = document.getElementById('addColumnBtn');
+            const removeRowBtn = document.getElementById('removeRowBtn');
+            const removeColumnBtn = document.getElementById('removeColumnBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const boldBtn = document.getElementById('boldBtn');
+            const italicBtn = document.getElementById('italicBtn');
+            const colorBtn = document.getElementById('colorBtn');
+            
+            let currentCell = null;
+            let isEditing = false;
             
             // Generate table on page load
             generateTable();
             
-            // Generate table when button is clicked
+            // Event listeners
             generateBtn.addEventListener('click', generateTable);
+            clearBtn.addEventListener('click', clearTable);
             
-            // Reset table when reset button is clicked
-            resetBtn.addEventListener('click', function() {
-                rowsInput.value = 5;
-                columnsInput.value = 4;
-                dynamicTable.innerHTML = '';
-                emptyState.style.display = 'flex';
-                tableInfo.style.display = 'none';
+            // Table manipulation buttons
+            addRowBtn.addEventListener('click', addRow);
+            addColumnBtn.addEventListener('click', addColumn);
+            removeRowBtn.addEventListener('click', removeRow);
+            removeColumnBtn.addEventListener('click', removeColumn);
+            
+            // Formatting buttons
+            exportBtn.addEventListener('click', exportTable);
+            boldBtn.addEventListener('click', () => formatText('bold'));
+            italicBtn.addEventListener('click', () => formatText('italic'));
+            colorBtn.addEventListener('click', showColorPicker);
+            
+            // Generate table on Enter key in inputs
+            [rowsInput, columnsInput, tableTitleInput, cellPaddingInput].forEach(input => {
+                input.addEventListener('keyup', function(event) {
+                    if (event.key === 'Enter') generateTable();
+                });
             });
             
-            // Generate table when Enter key is pressed in input fields
-            rowsInput.addEventListener('keyup', function(event) {
-                if (event.key === 'Enter') generateTable();
-            });
-            
-            columnsInput.addEventListener('keyup', function(event) {
-                if (event.key === 'Enter') generateTable();
+            // Close color picker when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!colorPicker.contains(event.target) && event.target !== colorBtn) {
+                    colorPicker.style.display = 'none';
+                }
             });
             
             // Function to generate the table
             function generateTable() {
                 const rows = parseInt(rowsInput.value);
                 const columns = parseInt(columnsInput.value);
+                const tableTitle = tableTitleInput.value;
+                const cellPadding = parseInt(cellPaddingInput.value);
                 
                 // Validate inputs
-                if (isNaN(rows) || rows < 1 || rows > 50) {
-                    alert('Please enter a valid number of rows between 1 and 50');
+                if (isNaN(rows) || rows < 1 || rows > 100) {
+                    alert('Please enter a valid number of rows between 1 and 100');
                     rowsInput.focus();
                     return;
                 }
                 
-                if (isNaN(columns) || columns < 1 || columns > 20) {
-                    alert('Please enter a valid number of columns between 1 and 20');
+                if (isNaN(columns) || columns < 1 || columns > 26) {
+                    alert('Please enter a valid number of columns between 1 and 26');
                     columnsInput.focus();
                     return;
                 }
@@ -348,10 +637,14 @@
                 // Clear previous table
                 dynamicTable.innerHTML = '';
                 
-                // Create table header
-                let tableHTML = '<thead><tr>';
-                for (let i = 1; i <= columns; i++) {
-                    tableHTML += `<th>Column ${i}</th>`;
+                // Create table header with title
+                let tableHTML = `<caption style="caption-side: top; font-size: 1.5rem; font-weight: bold; padding: 15px; color: #667eea;">${tableTitle}</caption>`;
+                tableHTML += '<thead><tr>';
+                
+                // Column headers (A, B, C...)
+                for (let i = 0; i < columns; i++) {
+                    const colName = String.fromCharCode(65 + i); // A, B, C...
+                    tableHTML += `<th>${colName}</th>`;
                 }
                 tableHTML += '</tr></thead>';
                 
@@ -359,8 +652,9 @@
                 tableHTML += '<tbody>';
                 for (let i = 1; i <= rows; i++) {
                     tableHTML += '<tr>';
-                    for (let j = 1; j <= columns; j++) {
-                        tableHTML += `<td contenteditable="true">Row ${i}, Col ${j}</td>`;
+                    for (let j = 0; j < columns; j++) {
+                        const colName = String.fromCharCode(65 + j);
+                        tableHTML += `<td contenteditable="true" data-row="${i}" data-col="${colName}">${colName}${i}</td>`;
                     }
                     tableHTML += '</tr>';
                 }
@@ -369,27 +663,257 @@
                 // Insert table HTML
                 dynamicTable.innerHTML = tableHTML;
                 
+                // Apply cell padding
+                const cells = dynamicTable.querySelectorAll('td, th');
+                cells.forEach(cell => {
+                    cell.style.padding = `${cellPadding}px`;
+                });
+                
                 // Hide empty state and show table
                 emptyState.style.display = 'none';
-                tableInfo.textContent = `Table with ${rows} rows and ${columns} columns generated`;
-                tableInfo.style.display = 'block';
+                tableStats.innerHTML = `<span>Table: ${rows} rows × ${columns} columns</span><span>Double-click to edit cells</span>`;
+                tableStats.style.display = 'flex';
                 
                 // Add event listeners to table cells for editing
+                setupCellEditing();
+            }
+            
+            // Function to set up cell editing
+            function setupCellEditing() {
                 const cells = dynamicTable.querySelectorAll('td');
+                
                 cells.forEach(cell => {
-                    cell.addEventListener('click', function() {
+                    // Clear previous event listeners to avoid duplicates
+                    cell.replaceWith(cell.cloneNode(true));
+                });
+                
+                // Get fresh references to cells
+                const freshCells = dynamicTable.querySelectorAll('td');
+                
+                freshCells.forEach(cell => {
+                    // Double-click to edit
+                    cell.addEventListener('dblclick', function() {
                         this.focus();
+                        isEditing = true;
+                        currentCell = this;
+                        this.classList.add('editing-cell');
+                    });
+                    
+                    // Single click to select
+                    cell.addEventListener('click', function(e) {
+                        if (!isEditing) {
+                            currentCell = this;
+                            // Remove editing class from all cells
+                            freshCells.forEach(c => c.classList.remove('editing-cell'));
+                            this.classList.add('editing-cell');
+                        }
                     });
                     
                     // Save content on blur
                     cell.addEventListener('blur', function() {
+                        isEditing = false;
+                        this.classList.remove('editing-cell');
+                        
                         if (this.textContent.trim() === '') {
-                            const rowIndex = this.parentElement.rowIndex;
-                            const cellIndex = this.cellIndex + 1;
-                            this.textContent = `Row ${rowIndex}, Col ${cellIndex}`;
+                            const row = this.getAttribute('data-row');
+                            const col = this.getAttribute('data-col');
+                            this.textContent = `${col}${row}`;
+                        }
+                    });
+                    
+                    // Keyboard shortcuts in cells
+                    cell.addEventListener('keydown', function(e) {
+                        // Tab key to move to next cell
+                        if (e.key === 'Tab') {
+                            e.preventDefault();
+                            const cellsArray = Array.from(freshCells);
+                            const currentIndex = cellsArray.indexOf(this);
+                            const nextIndex = e.shiftKey ? currentIndex - 1 : currentIndex + 1;
+                            
+                            if (nextIndex >= 0 && nextIndex < cellsArray.length) {
+                                cellsArray[nextIndex].focus();
+                            }
+                        }
+                        
+                        // Enter key to move to cell below
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const row = parseInt(this.getAttribute('data-row'));
+                            const col = this.getAttribute('data-col');
+                            const nextRowCell = dynamicTable.querySelector(`td[data-row="${row+1}"][data-col="${col}"]`);
+                            
+                            if (nextRowCell) {
+                                nextRowCell.focus();
+                            }
                         }
                     });
                 });
+            }
+            
+            // Function to clear table
+            function clearTable() {
+                rowsInput.value = 6;
+                columnsInput.value = 5;
+                tableTitleInput.value = "Sample Data Table";
+                cellPaddingInput.value = 15;
+                dynamicTable.innerHTML = '';
+                emptyState.style.display = 'flex';
+                tableStats.style.display = 'none';
+                colorPicker.style.display = 'none';
+            }
+            
+            // Function to add a row
+            function addRow() {
+                const rows = parseInt(rowsInput.value);
+                const columns = parseInt(columnsInput.value);
+                
+                rowsInput.value = rows + 1;
+                generateTable();
+            }
+            
+            // Function to add a column
+            function addColumn() {
+                const columns = parseInt(columnsInput.value);
+                
+                if (columns < 26) {
+                    columnsInput.value = columns + 1;
+                    generateTable();
+                } else {
+                    alert('Maximum 26 columns allowed');
+                }
+            }
+            
+            // Function to remove a row
+            function removeRow() {
+                const rows = parseInt(rowsInput.value);
+                
+                if (rows > 1) {
+                    rowsInput.value = rows - 1;
+                    generateTable();
+                } else {
+                    alert('Table must have at least 1 row');
+                }
+            }
+            
+            // Function to remove a column
+            function removeColumn() {
+                const columns = parseInt(columnsInput.value);
+                
+                if (columns > 1) {
+                    columnsInput.value = columns - 1;
+                    generateTable();
+                } else {
+                    alert('Table must have at least 1 column');
+                }
+            }
+            
+            // Function to format text
+            function formatText(formatType) {
+                if (!currentCell) {
+                    alert('Please select a cell first by clicking on it');
+                    return;
+                }
+                
+                const selection = window.getSelection();
+                if (selection.toString().length > 0) {
+                    document.execCommand(formatType, false, null);
+                } else {
+                    // If no text selected, toggle formatting for entire cell
+                    const cell = currentCell;
+                    const currentHTML = cell.innerHTML;
+                    
+                    if (formatType === 'bold') {
+                        if (currentHTML.startsWith('<b>') && currentHTML.endsWith('</b>')) {
+                            cell.innerHTML = currentHTML.slice(3, -4);
+                        } else {
+                            cell.innerHTML = `<b>${currentHTML}</b>`;
+                        }
+                    } else if (formatType === 'italic') {
+                        if (currentHTML.startsWith('<i>') && currentHTML.endsWith('</i>')) {
+                            cell.innerHTML = currentHTML.slice(3, -4);
+                        } else {
+                            cell.innerHTML = `<i>${currentHTML}</i>`;
+                        }
+                    }
+                }
+            }
+            
+            // Function to show color picker
+            function showColorPicker() {
+                if (!currentCell) {
+                    alert('Please select a cell first by clicking on it');
+                    return;
+                }
+                
+                const rect = colorBtn.getBoundingClientRect();
+                colorPicker.style.display = 'block';
+                colorPicker.style.position = 'fixed';
+                colorPicker.style.top = `${rect.bottom + 5}px`;
+                colorPicker.style.left = `${rect.left}px`;
+                
+                // Add event listeners to color options
+                const colorOptions = colorPicker.querySelectorAll('.color-option');
+                colorOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        const color = this.getAttribute('data-color');
+                        currentCell.style.backgroundColor = color;
+                        colorPicker.style.display = 'none';
+                    });
+                });
+            }
+            
+            // Function to export table as HTML
+            function exportTable() {
+                if (dynamicTable.innerHTML.trim() === '') {
+                    alert('No table to export. Please generate a table first.');
+                    return;
+                }
+                
+                // Clone table to avoid modifying the original
+                const tableClone = dynamicTable.cloneNode(true);
+                
+                // Remove contenteditable attribute from cloned table
+                const cells = tableClone.querySelectorAll('[contenteditable]');
+                cells.forEach(cell => {
+                    cell.removeAttribute('contenteditable');
+                });
+                
+                // Get table HTML
+                const tableHTML = tableClone.outerHTML;
+                
+                // Create HTML document with the table
+                const fullHTML = `<!DOCTYPE html>
+<html>
+<head>
+    <title>Exported Table</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+        th { background-color: #667eea; color: white; padding: 15px; text-align: center; }
+        td { padding: 15px; border: 1px solid #ddd; text-align: center; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        caption { font-size: 1.5rem; font-weight: bold; padding: 15px; color: #667eea; }
+    </style>
+</head>
+<body>
+    <h1>Exported Table</h1>
+    <p>Generated on ${new Date().toLocaleDateString()}</p>
+    ${tableHTML}
+</body>
+</html>`;
+                
+                // Create download link
+                const blob = new Blob([fullHTML], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'table-export.html';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                alert('Table exported successfully as HTML file!');
             }
         });
     </script>
